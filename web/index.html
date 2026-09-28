@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#1f5a24" />
+    <meta name="description" content="Build a ballpark, win back the fans and turn a last-place club around in one 72-game season." />
+    <title>Baseball Tycoon</title>
+    <!-- Share cards. og:image is relative until the final domain is known; make it absolute when publishing. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Baseball Tycoon" />
+    <meta property="og:description" content="Build the ballpark. Win back the fans. Turn a last-place club around in one 72-game season." />
+    <meta property="og:image" content="./og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Baseball Tycoon" />
+    <meta name="twitter:description" content="Build the ballpark. Win back the fans. Turn a last-place club around in one 72-game season." />
+    <meta name="twitter:image" content="./og.jpg" />
+  </head>
+  <body>
+    <div id="app">
+      <header id="top-bar">
+        <div class="brand"><span class="brand-ball" id="brand-ball"></span><span class="brand-name">Baseball Tycoon</span></div>
+        <div class="hud">
+          <div class="hud-chip" id="chip-cash" title="Cash">
+            <span class="chip-label">Cash</span><strong id="header-cash">$0</strong>
+          </div>
+          <div class="hud-chip" title="Games played">
+            <span class="chip-label">Game</span><strong id="header-games">0/72</strong>
+          </div>
+          <div class="hud-chip" title="Wins and losses">
+            <span class="chip-label">W-L</span><strong id="header-record">0-0</strong>
+          </div>
+          <div class="hud-chip" id="chip-fans" title="Fan happiness">
+            <span class="chip-label">Fans</span><strong id="header-happiness">0%</strong>
+          </div>
+        </div>
+        <div class="header-actions">
+          <div class="speed-group" role="group" aria-label="Game speed">
+            <button type="button" class="bar-btn icon-btn" id="btn-pause" aria-label="Pause" title="Pause (Space)"></button>
+            <button type="button" class="bar-btn icon-btn speed-btn" data-speed="1" aria-label="Normal speed" title="Normal speed (1)"></button>
+            <button type="button" class="bar-btn icon-btn speed-btn" data-speed="2" aria-label="Fast" title="Fast (2)"></button>
+            <button type="button" class="bar-btn icon-btn speed-btn" data-speed="4" aria-label="Very fast" title="Very fast (3)"></button>
+          </div>
+          <div class="notif-wrap">
+            <button type="button" class="bar-btn icon-btn" id="btn-notifications" aria-label="News" title="News">
+              <span id="bell-icon"></span>
+              <span id="notif-badge" class="notif-badge hidden">0</span>
+            </button>
+            <div id="notif-inbox" class="notif-inbox hidden">
+              <div class="notif-inbox-head">
+                <strong>News</strong>
+                <button type="button" class="notif-clear" id="notif-clear">Clear all</button>
+              </div>
+              <div id="notif-inbox-list" class="notif-inbox-list">
+                <div class="notif-empty">No news yet.</div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="bar-btn icon-btn" id="btn-sound" aria-label="Sound" title="Sound (M)"></button>
+          <button type="button" class="bar-btn icon-btn" id="btn-menu" aria-label="Menu" title="Menu"></button>
+        </div>
+      </header>
+
+      <div id="main-row">
+        <aside id="sidebar">
+          <nav class="sidebar-tabs" aria-label="Panels">
+            <button type="button" class="sidebar-tab active" data-tab="park">Park</button>
+            <button type="button" class="sidebar-tab" data-tab="build">Build</button>
+            <button type="button" class="sidebar-tab" data-tab="money">Money</button>
+            <button type="button" class="sidebar-tab" data-tab="team">Team</button>
+            <button type="button" class="sidebar-tab" data-tab="office">Office</button>
+          </nav>
+
+          <div class="sidebar-panels">
+            <section class="sidebar-panel active" data-panel="park">
+              <div class="goal-box">
+                <div class="goal-title" id="scenario-name">Turn It Around</div>
+                <div id="goal-list" class="goal-list"></div>
+              </div>
+              <div class="guide-box" id="next-step"></div>
+              <div class="section-label">Last home game</div>
+              <div id="last-game" class="panel-box"></div>
+              <div class="section-label">What the fans think</div>
+              <div id="fan-report" class="panel-box"></div>
+              <div class="section-label">Ballpark</div>
+              <div class="stat-block" id="park-stats"></div>
+            </section>
+
+            <section class="sidebar-panel" data-panel="build">
+              <div class="tool-switch">
+                <button type="button" class="tool-mode active" data-mode="build"><span data-icon="hammer"></span> Build</button>
+                <button type="button" class="tool-mode" data-mode="demolish"><span data-icon="bulldoze"></span> Bulldoze</button>
+                <button type="button" class="tool-mode" id="btn-undo"><span data-icon="undo"></span> Undo</button>
+              </div>
+              <div id="build-list"></div>
+            </section>
+
+            <section class="sidebar-panel" data-panel="money">
+              <div class="section-label">Ticket price</div>
+              <div class="panel-box price-box">
+                <div class="price-row">
+                  <button type="button" class="bar-btn sm" id="ticket-down" aria-label="Lower ticket price">-</button>
+                  <input type="range" id="ticket-price" min="1" max="40" step="1" value="8" aria-label="Ticket price" />
+                  <button type="button" class="bar-btn sm" id="ticket-up" aria-label="Raise ticket price">+</button>
+                  <strong id="ticket-price-label">$8</strong>
+                </div>
+                <div class="price-hint" id="ticket-hint"></div>
+              </div>
+              <div class="section-label">Menu prices</div>
+              <div class="tool-switch" id="food-price">
+                <button type="button" class="tool-mode" data-food="low">Cheap</button>
+                <button type="button" class="tool-mode" data-food="fair">Fair</button>
+                <button type="button" class="tool-mode" data-food="high">Pricey</button>
+              </div>
+              <div class="price-hint" id="food-hint"></div>
+              <div class="section-label">Bank</div>
+              <div class="panel-box">
+                <div class="stat-line"><span>Cash</span><strong id="cash">$0</strong></div>
+                <div class="stat-line"><span>Loan</span><strong id="debt">$0</strong></div>
+                <div class="stat-line"><span>Interest per game</span><strong id="interest">$0</strong></div>
+                <div class="loan-row">
+                  <button type="button" class="bar-btn sm" id="btn-borrow">Borrow $25,000</button>
+                  <button type="button" class="bar-btn sm" id="btn-repay">Repay</button>
+                </div>
+              </div>
+              <div class="section-label">Profit per home game</div>
+              <canvas id="profit-graph" width="250" height="70"></canvas>
+              <div class="section-label">Season books</div>
+              <div id="finance-summary" class="panel-box"></div>
+            </section>
+
+            <section class="sidebar-panel" data-panel="team">
+              <div class="section-label">Haymakers</div>
+              <div id="team-ratings" class="panel-box"></div>
+              <div class="section-label">Free agents</div>
+              <div id="signing-list" class="entry-list"></div>
+              <div class="section-label">Standings</div>
+              <div id="standings" class="panel-box"></div>
+              <div class="section-label">Coming up</div>
+              <div id="schedule" class="panel-box"></div>
+              <div class="section-label">Roster</div>
+              <div id="roster" class="panel-box"></div>
+            </section>
+
+            <section class="sidebar-panel" data-panel="office">
+              <div class="section-label">Staff</div>
+              <div id="staff-list" class="entry-list"></div>
+              <div class="section-label">Promotions</div>
+              <div id="marketing-list" class="entry-list"></div>
+              <div class="section-label">Upgrades</div>
+              <div id="research-list" class="entry-list"></div>
+            </section>
+          </div>
+        </aside>
+
+        <div id="play-area">
+          <canvas id="game-canvas"></canvas>
+          <div id="scorebug" class="hidden"></div>
+          <div id="selection-bar" class="hidden">
+            <span id="selection-text"></span>
+            <button type="button" class="bar-btn sm" id="selection-cancel">Done</button>
+          </div>
+          <div class="zoom-controls">
+            <button type="button" class="bar-btn icon-btn" id="zoom-in" aria-label="Zoom in"></button>
+            <button type="button" class="bar-btn icon-btn" id="zoom-out" aria-label="Zoom out"></button>
+            <button type="button" class="bar-btn icon-btn" id="btn-reset-view" aria-label="Center the park"></button>
+          </div>
+          <div id="canvas-hint"></div>
+          <div id="notification-stack" aria-live="polite" aria-atomic="false"></div>
+          <button type="button" id="btn-play-ball" class="play-ball hidden">Play Ball!</button>
+          <button type="button" id="btn-resume-pill" class="paused-pill hidden">Paused. Tap to resume</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="title-screen" class="overlay title-overlay">
+      <div class="title-card">
+        <div class="title-logo">
+          <div class="title-ball" id="title-ball"></div>
+          <h1>Baseball<br /><span>Tycoon</span></h1>
+        </div>
+        <p class="title-pitch">Build the ballpark. Win back the fans. Turn a last-place club around.</p>
+        <div class="title-buttons">
+          <button type="button" class="big-btn primary" id="btn-new-season">New Season</button>
+          <button type="button" class="big-btn hidden" id="btn-continue">Continue</button>
+        </div>
+        <div class="overlay-divider">Pick a season</div>
+        <div id="scenario-list" class="scenario-list"></div>
+        <div class="title-links">
+          <button type="button" class="link-btn" id="btn-how-to">How to play</button>
+          <a class="link-btn" id="portal-link" href="https://vibejam.com/portal/2026" rel="noopener">Vibe Jam portal</a>
+          <a class="link-btn hidden" id="portal-back" href="#" rel="noopener">Back through the portal</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="howto-screen" class="overlay hidden">
+      <div class="overlay-panel">
+        <h2>How to play</h2>
+        <div class="overlay-body">
+          <ol class="howto-list">
+            <li><strong>Games play themselves.</strong> The season runs on its own clock. Pause any time to think.</li>
+            <li><strong>Read the fan report.</strong> After every home game the Park tab shows what fans loved and hated.</li>
+            <li><strong>Build what they ask for.</strong> Pick something in the Build tab, then click a concourse tile.</li>
+            <li><strong>Set your prices.</strong> The Money tab has ticket and menu prices. Cheap seats fill the park; greedy ones empty it.</li>
+            <li><strong>Build a winner.</strong> Training facilities, coaches and free agents turn losses into wins, and winning sells tickets.</li>
+            <li><strong>Hit all three goals</strong> by the last game to win the season.</li>
+          </ol>
+          <div class="section-label">Controls</div>
+          <table class="keys">
+            <tr><td>Drag</td><td>Move the view</td></tr>
+            <tr><td>Scroll / pinch</td><td>Zoom</td></tr>
+            <tr><td>Click / tap a tile</td><td>Build or bulldoze (tap twice on touch screens)</td></tr>
+            <tr><td>Space</td><td>Pause</td></tr>
+            <tr><td>1 2 3</td><td>Game speed</td></tr>
+            <tr><td>B / X / U</td><td>Build, bulldoze, undo</td></tr>
+            <tr><td>Arrows or WASD</td><td>Move the view</td></tr>
+            <tr><td>M</td><td>Sound on or off</td></tr>
+          </table>
+          <button type="button" class="big-btn primary" id="btn-howto-close">Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="menu-screen" class="overlay hidden">
+      <div class="overlay-panel narrow">
+        <h2>Menu</h2>
+        <div class="overlay-body menu-body">
+          <button type="button" class="big-btn primary" id="btn-resume">Back to the game</button>
+          <button type="button" class="big-btn" id="btn-save">Save season</button>
+          <button type="button" class="big-btn" id="btn-menu-howto">How to play</button>
+          <button type="button" class="big-btn" id="btn-quit">Quit to title</button>
+          <div class="title-links">
+            <a class="link-btn" id="menu-portal-link" href="https://vibejam.com/portal/2026" rel="noopener">Vibe Jam portal</a>
+            <a class="link-btn hidden" id="menu-portal-back" href="#" rel="noopener">Back through the portal</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="end-screen" class="overlay hidden">
+      <div class="overlay-panel">
+        <h2 id="end-title">Season over</h2>
+        <div class="overlay-body">
+          <p class="end-reason" id="end-reason"></p>
+          <div id="end-goals" class="goal-list"></div>
+          <div class="end-score">
+            <div class="end-grade" id="end-grade"></div>
+            <div class="end-total"><span>Score</span><strong id="end-total">0</strong></div>
+            <div class="end-best" id="end-best"></div>
+          </div>
+          <div id="end-lines" class="panel-box"></div>
+          <div class="title-buttons">
+            <button type="button" class="big-btn primary" id="btn-play-again">Play again</button>
+            <button type="button" class="big-btn" id="btn-end-title">Title screen</button>
+          </div>
+          <div class="title-links">
+            <a class="link-btn" id="end-portal-link" href="https://vibejam.com/portal/2026" rel="noopener">Vibe Jam portal</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+    <script async src="https://vibejam.com/2026/widget.js"></script>
+  </body>
+</html>

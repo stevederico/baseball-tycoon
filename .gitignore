@@ -1,0 +1,19 @@
+.DS_Store
+*.local
+
+# Web
+web/node_modules/
+web/dist/
+web/.dogfood/
+.dogfood/
+
+# Browser test scratch
+.agent-browser/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Local hand-off notes
+SUMMARY.md
